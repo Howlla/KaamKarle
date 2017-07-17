@@ -3,6 +3,7 @@ package com.example.bhavyesharma.kaamkarle;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TimePicker;
 
 public class ReminderDetailActivity extends AppCompatActivity {
     int id;
@@ -30,6 +32,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
         reminderDateEditText=(EditText)findViewById(R.id.reminderDateEditText);
         reminderTimeEditText=(EditText)findViewById(R.id.reminderTimeEditText);
         Button submitButton=(Button)findViewById(R.id.reminderSubmitButton);
+        Button cancelButton=(Button)findViewById(R.id.reminderCancelButton);
         Intent i = getIntent();
         id=i.getIntExtra(IntentConstants.REMINDER_ID, -1);
         if(id!=-1){
@@ -38,6 +41,13 @@ public class ReminderDetailActivity extends AppCompatActivity {
             String details = i.getStringExtra(IntentConstants.REMINDER_DETAILS);
             reminderDetailTextView.setText(IntentConstants.REMINDER_DETAILS);
         }
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(ReminderDetailActivity.this,MainActivity.class);
+                startActivity(i);
+            }
+        });
 submitButton.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
@@ -69,6 +79,28 @@ submitButton.setOnClickListener(new View.OnClickListener() {
                 showDatePicker(ReminderDetailActivity.this, year, month, 1);
             }
         });
+        reminderTimeEditText=(EditText)findViewById(R.id.reminderTimeEditText);
+        reminderTimeEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar newCalendar=Calendar.getInstance();
+                int hour=newCalendar.get(Calendar.HOUR_OF_DAY);
+                int minute=newCalendar.get(Calendar.MINUTE);
+                showTimePicker(ReminderDetailActivity.this,hour,minute);
+            }
+        });
+
+    }
+
+    public void showTimePicker(Context context, int initialHour, int initialMinute){
+        TimePickerDialog timePickerDialog=new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int i, int i1) {
+            reminderTimeEditText.setText(i+":"+i1);
+
+            }
+        }, initialHour, initialMinute, false);
+        timePickerDialog.show();
 
     }
     public void showDatePicker(Context context, int initialYear, int initialMonth, int initialDay) {
@@ -117,7 +149,7 @@ submitButton.setOnClickListener(new View.OnClickListener() {
         calendar.set(Calendar.SECOND, 0);
         //calendar.set(Calendar.AM_PM,Calendar.PM);
 
-        Intent myIntent = new Intent(ReminderDetailActivity.this, MyReceiver.class);
+        Intent myIntent = new Intent(ReminderDetailActivity.this, AlarmReceiver.class);
         myIntent.putExtra("title",newTitle);
         pendingIntent = PendingIntent.getBroadcast(ReminderDetailActivity.this, 0, myIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 

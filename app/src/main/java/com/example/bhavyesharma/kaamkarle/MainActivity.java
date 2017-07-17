@@ -1,12 +1,18 @@
 package com.example.bhavyesharma.kaamkarle;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +20,7 @@ import android.view.MenuItem;
 import com.sergiocasero.revealfab.RevealFAB;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<Reminder> mReminderList;
@@ -41,8 +48,54 @@ public class MainActivity extends AppCompatActivity {
 
         }
         );
+        mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        mReminderList=new ArrayList<>();
+        mRecyclerView.setAdapter(mAdapter);
+        updateReminderList();
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                int from = viewHolder.getAdapterPosition();
+                int to = target.getAdapterPosition();
+                Collections.swap(mReminderList,from,to);
+                mAdapter.notifyItemMoved(from,to);
+                return true;
+            }
 
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                mReminderList.remove(position);
+                mAdapter.notifyItemRemoved(position);
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
+
+
+
+    private void updateReminderList() {
+        ReminderOpenHelper reminderOpenHelper = ReminderOpenHelper.getReminderOpenHelperInstance(this);
+        mReminderList.clear();
+        SQLiteDatabase database = reminderOpenHelper.getReadableDatabase();
+        Cursor cursor = database.query(reminderOpenHelper.REMINDER_TABLE_NAME, null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            String title = cursor.getString(cursor.getColumnIndex(ReminderOpenHelper.REMINDER_TITLE));
+            String details = cursor.getString(cursor.getColumnIndex(ReminderOpenHelper.REMINDER_DETAILS));
+            String time = cursor.getString(cursor.getColumnIndex(ReminderOpenHelper.REMINDER_TIME));
+            String date = cursor.getString(cursor.getColumnIndex(ReminderOpenHelper.REMINDER_DATE));
+            String id = cursor.getString(cursor.getColumnIndex(ReminderOpenHelper.REMINDER_ID));
+            Reminder R = new Reminder(title, details, date, time);
+            mReminderList.add(R);
+
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();

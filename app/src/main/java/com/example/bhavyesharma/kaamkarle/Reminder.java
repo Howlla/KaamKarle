@@ -10,10 +10,10 @@ import java.util.Date;
 public class Reminder {
     private String title;
     private String details;
-    private Date taskDate;
-    private Time taskTime;
+    private String taskDate;
+    private String taskTime;
 
-    public Reminder(String title, Date taskDate, Time taskTime) {
+    public Reminder(String title, String taskDate, String taskTime) {
         this.title = title;
         this.taskDate = taskDate;
         this.taskTime = taskTime;
@@ -36,23 +36,23 @@ public class Reminder {
         this.details = details;
     }
 
-    public Date getTaskDate() {
+    public String getTaskDate() {
         return taskDate;
     }
 
-    public void setTaskDate(Date taskDate) {
+    public void setTaskDate(String taskDate) {
         this.taskDate = taskDate;
     }
 
-    public Time getTaskTime() {
+    public String getTaskTime() {
         return taskTime;
     }
 
-    public void setTaskTime(Time taskTime) {
+    public void setTaskTime(String taskTime) {
         this.taskTime = taskTime;
     }
 
-    public Reminder(String title, String details, Date taskDate, Time taskTime) {
+    public Reminder(String title, String details, String taskDate, String taskTime) {
         this.title = title;
         this.details = details;
         this.taskDate = taskDate;
