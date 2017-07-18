@@ -33,7 +33,7 @@ public class ReminderOpenHelper extends SQLiteOpenHelper {
 String query="create table "+REMINDER_TABLE_NAME+"("+REMINDER_ID+
         " integer primary key autoincrement, " + REMINDER_TITLE +" text, "
                 + REMINDER_TIME + " text, "
-                + REMINDER_DATE + " text,"+REMINDER_DETAILS+"text);";
+                + REMINDER_DATE + " text, "+REMINDER_DETAILS+" text);";
         db.execSQL(query);
     }
 

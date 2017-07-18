@@ -12,6 +12,7 @@ import java.util.Calendar;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -34,13 +35,6 @@ public class ReminderDetailActivity extends AppCompatActivity {
         Button submitButton=(Button)findViewById(R.id.reminderSubmitButton);
         Button cancelButton=(Button)findViewById(R.id.reminderCancelButton);
         Intent i = getIntent();
-        id=i.getIntExtra(IntentConstants.REMINDER_ID, -1);
-        if(id!=-1){
-            String title = i.getStringExtra(IntentConstants.REMINDER_TITLE);
-            reminderTitleTextView.setText(title);
-            String details = i.getStringExtra(IntentConstants.REMINDER_DETAILS);
-            reminderDetailTextView.setText(IntentConstants.REMINDER_DETAILS);
-        }
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,7 +49,7 @@ submitButton.setOnClickListener(new View.OnClickListener() {
         String newDetail=reminderDetailTextView.getText().toString();
         String newDate=reminderDateEditText.getText().toString();
         String newTime=reminderTimeEditText.getText().toString();
-        setReminder(newTime,newDate,newTitle);
+
 
         ReminderOpenHelper reminderOpenHelper=ReminderOpenHelper.getReminderOpenHelperInstance(ReminderDetailActivity.this);
         SQLiteDatabase database = reminderOpenHelper.getWritableDatabase();
@@ -64,8 +58,10 @@ submitButton.setOnClickListener(new View.OnClickListener() {
         cv.put(ReminderOpenHelper.REMINDER_DETAILS,newDetail);
         cv.put(ReminderOpenHelper.REMINDER_DATE,newDate);
         cv.put(ReminderOpenHelper.REMINDER_TIME,newTime);
-        database.insert(ReminderOpenHelper.REMINDER_TABLE_NAME,null,cv);
+        long i = database.insert(ReminderOpenHelper.REMINDER_TABLE_NAME,null,cv);
+        Log.i("TAG", "Position " + i);
         setResult(RESULT_OK);
+        setReminder(newTime,newDate,newTitle);
         finish();
     }
 });

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Remind
 
         TextView titleTextView;
         TextView detailsTextView;
-        Button removeButton;
+        ImageButton removeButton;
         ReminderClickListener mReminderClickListener;
 
         public ReminderViewHolder(View itemView, ReminderClickListener listener) {

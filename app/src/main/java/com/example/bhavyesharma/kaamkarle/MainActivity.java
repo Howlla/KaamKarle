@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +23,7 @@ import com.sergiocasero.revealfab.RevealFAB;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerAdapter.ReminderClickListener {
     ArrayList<Reminder> mReminderList;
     RecyclerView mRecyclerView;
     RecyclerAdapter mAdapter;
@@ -49,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
         }
         );
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view);
-        mReminderList=new ArrayList<>();
+        mReminderList=new ArrayList<Reminder>();
+        mAdapter=new RecyclerAdapter(this,mReminderList,this);
         mRecyclerView.setAdapter(mAdapter);
         updateReminderList();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -90,8 +92,10 @@ public class MainActivity extends AppCompatActivity {
             String id = cursor.getString(cursor.getColumnIndex(ReminderOpenHelper.REMINDER_ID));
             Reminder R = new Reminder(title, details, date, time);
             mReminderList.add(R);
+            Log.i("TAG",""+title+details);
 
         }
+        Log.i("TAG", "Size " + mReminderList.size());
         mAdapter.notifyDataSetChanged();
     }
 
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateReminderList();
         revealFAB.onResume();
     }
     @Override
@@ -121,5 +126,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+
+    }
+
+    @Override
+    public void onRemoveClicked(int position) {
+    mReminderList.remove(position);
+
+        ReminderOpenHelper reminderOpenHelper=ReminderOpenHelper.getReminderOpenHelperInstance(MainActivity.this);
+        SQLiteDatabase database = reminderOpenHelper.getWritableDatabase();
+
+        database.delete(ReminderOpenHelper.REMINDER_TABLE_NAME, "id = "+ position+1 , null);
+        mAdapter.notifyItemRemoved(position);
     }
 }
